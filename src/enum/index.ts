@@ -1,0 +1,13 @@
+export enum ENameFormOrderHotel {
+	YOUR_NAME = "YOUR_NAME",
+	EMAIL = "EMAIL",
+	PHONE_NUMBER = "PHONE_NUMBER",
+	LOCATION = "LOCATION",
+	REQUEST = "REQUEST",
+	INTRODUCE = "INTRODUCE",
+}
+
+export enum ETypeModalAuth {
+	LOGIN = "LOGIN",
+	REGISTER = "REGISTER",
+}
