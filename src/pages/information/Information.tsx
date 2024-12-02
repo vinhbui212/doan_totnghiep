@@ -183,7 +183,10 @@ const Information = () => {
 					{initTab.map((tab, index) => (
 						<div
 							key={index}
-							onClick={() => setCurrentTab(tab.key)}
+							onClick={() => {
+								setCurrentTab(tab.key);
+								tab?.onClick?.();
+							}}
 							className={`flex items-center gap-5 cursor-pointer ${
 								currentTab === tab.key ? "text-primary_color" : ""
 							}`}
