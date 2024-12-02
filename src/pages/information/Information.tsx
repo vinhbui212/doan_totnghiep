@@ -1,6 +1,7 @@
 import { IFavorite, ITourOrder } from "@/common/types/tour";
 import Container from "@/components/layout/components/Container";
 import useCallApi from "@/hooks/useCallApi";
+import { paths } from "@/router/path";
 import {
 	getFavoriteService,
 	getOrderService,
@@ -22,15 +23,11 @@ import {
 	Typography,
 } from "antd";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const initTab = [
-	{ label: "Hồ sơ cá nhân", icon: <UserOutlined />, key: 0 },
-	{ label: "Đơn hàng của tôi", icon: <ContainerOutlined />, key: 1 },
-	{ label: "Danh sách yêu thích", icon: <HeartOutlined />, key: 2 },
-	{ label: "Thoát", icon: <LogoutOutlined />, key: 3 },
-];
 const Information = () => {
 	const [api, contextHolder] = notification.useNotification();
+	const navigate = useNavigate();
 	const [currentTab, setCurrentTab] = useState(0);
 	const [form] = Form.useForm();
 
@@ -39,7 +36,21 @@ const Information = () => {
 		func: getFavoriteService,
 	});
 
-	console.log({ dataFavorite });
+	const initTab = [
+		{ label: "Hồ sơ cá nhân", icon: <UserOutlined />, key: 0 },
+		{ label: "Đơn hàng của tôi", icon: <ContainerOutlined />, key: 1 },
+		{ label: "Danh sách yêu thích", icon: <HeartOutlined />, key: 2 },
+		{
+			label: "Thoát",
+			icon: <LogoutOutlined />,
+			key: 3,
+			onClick: () => {
+				localStorage.clear();
+				navigate(paths.home);
+				window.location.reload();
+			},
+		},
+	];
 
 	const onUpdateCustomer = async () => {
 		const values = form.getFieldsValue();
