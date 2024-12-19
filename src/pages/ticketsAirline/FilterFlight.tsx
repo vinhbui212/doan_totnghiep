@@ -37,6 +37,8 @@ const FilterFlight = ({ form, handleFilter }: IProps) => {
 					returnDate: value.returnDate
 						? formatDate(value.returnDate, "YYYY-MM-DD")
 						: null,
+						currency_code: "VND"
+						
 				});
 			}}
 		>

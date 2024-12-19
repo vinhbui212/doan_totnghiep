@@ -11,9 +11,9 @@ const LoadingSearchFlight = () => {
 			</Typography.Text>
 
 			<Typography.Text strong className="font-bold">
-				Hồ Chí Minh (SGN) Huế (HUI)
+				
 			</Typography.Text>
-			<Typography.Text type="secondary">Ngày đi: 2024-11-22</Typography.Text>
+			<Typography.Text type="secondary"></Typography.Text>
 			<Spin size="large" />
 		</div>
 	);

@@ -20,4 +20,5 @@ export const filterParams = (params: IndexObject) => {
 export const handleAuthSuccess = (res: any) => {
 	localStorage.setItem("token", res.token);
 	localStorage.setItem("customerId", res.customerId);
+	localStorage.setItem("customerName", res.customerName);
 };

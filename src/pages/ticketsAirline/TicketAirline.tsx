@@ -38,7 +38,7 @@ const TicketAirline = () => {
 						<Typography.Title level={3} className="!mb-0">
 							Chuyến bay ưu đãi
 						</Typography.Title>
-						<Row gutter={[20, 20]} className=" px-5">
+						<Row gutter={[10,1]} className=" px-5">
 							{data?.data?.flightOffers?.map((item) => {
 								return item.segments?.map((segment, index) => (
 									<Col xs={12} xl={8} key={index}>

@@ -120,11 +120,11 @@ const Header = ({ isAdmin }: IProps) => {
 					<Form layout="vertical" form={form}>
 						{!isLoginSelected && (
 							<>
-								<Form.Item name="firstName" label="First name" required>
-									<Input placeholder="First name" />
+								<Form.Item name="firstName" label="Họ" required>
+									<Input placeholder="Nhập họ" />
 								</Form.Item>
-								<Form.Item name="lastName" label="Last name" required>
-									<Input placeholder="Nhập last name" />
+								<Form.Item name="lastName" label="Tên" required>
+									<Input placeholder="Nhập tên" />
 								</Form.Item>
 							</>
 						)}
@@ -162,7 +162,7 @@ const Header = ({ isAdmin }: IProps) => {
 				</div>
 				{!isAdmin && (
 					<div className="flex items-center justify-between px-[30px] xl:px-[200px] mt-5">
-						<img src={Logo} alt="" />
+						<img className="cursor-pointer" src={Logo} alt="" onClick={() => navigate(paths.home)}/>
 						<ul className="flex uppercase gap-5 font-semibold">
 							{menus.service.map((service, index) => (
 								<li

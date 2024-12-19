@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 interface IProps {
 	idTour?: string;
 }
+
 const ReviewTour = ({ idTour }: IProps) => {
 	const [form] = Form.useForm();
 	const [api, contextHolder] = notification.useNotification();
@@ -19,7 +20,7 @@ const ReviewTour = ({ idTour }: IProps) => {
 		const res = await getReviewTourService(idTour);
 		setDataReview(res);
 	};
-
+	const name = localStorage.getItem("customerName");
 	const handleSubmit = async () => {
 		try {
 			await addReviewTourService({
@@ -27,6 +28,7 @@ const ReviewTour = ({ idTour }: IProps) => {
 				comment: form.getFieldsValue().comment,
 				rating: rate,
 				date: dayjs().toISOString(),
+				customerName:name
 			});
 			handleGetData();
 			api.success({

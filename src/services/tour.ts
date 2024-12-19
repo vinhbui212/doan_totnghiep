@@ -2,7 +2,7 @@
 import { axiosCreatesForme } from "@/api/configApi";
 
 export const getToursService = () => {
-	return axiosCreatesForme.get("tours", { params: { page: 0, size: 100 } });
+	return axiosCreatesForme.get("tours" );
 };
 
 export const getTourDetailService = async (tourId: string) => {
@@ -43,3 +43,19 @@ export const addReviewTourService = async (data: any) => {
 		hasReviewed: true,
 	});
 };
+
+
+export const getTourByAIService = async () => {
+	const customerId = localStorage.getItem("customerId");
+	return await axiosCreatesForme.post(`review`, {
+		// ...data,
+		// customerId,
+		// customerName: "",
+		// hasReviewed: true,
+	});
+};
+
+
+export const favoriteTourService = (tourId: string) => {
+	return axiosCreatesForme.post(`/wishlist/add?tourID=${tourId}`, );
+}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ITourDetail } from "@/common/types/tour";
 import Container from "@/components/layout/components/Container";
-import { formatDate, formatPrice } from "@/helper/func";
+import { formatPrice } from "@/helper/func";
 import { paymentSubmitOrderService } from "@/services/payment";
 import { orderTourService } from "@/services/tour";
 import {
@@ -66,30 +66,39 @@ const OrderTour = ({ tour }: IProps) => {
 		lv3,
 		lv4,
 	]);
-
+	const customerId = localStorage.getItem("customerId");
+	const customerName = localStorage.getItem("customerName");
 	const onOrderTour = async () => {
 		const values = form.getFieldsValue();
+		const paymentMethod = values.method;
 		try {
-			// const res = (await orderTourService({
-			// 	customerName: values?.customerName,
-			// 	travelDate: dayjs(values?.bookingDate).format("YYYY-MM-DD"),
-			// 	numOfPeople: (lv1 + lv2 + lv3)?.toString(),
-			// 	numOfChildren: lv4?.toString(),
-			// 	status: "New",
-			// 	tourId: tour.id?.toString(),
-			// 	tourName: tour.title,
-			// })) as any;
+			const orderData = {
+				customerName: customerName, // Tên khách hàng
+				numOfPeople: (lv1).toString(), // Tổng số người tham gia
+				numOfChildren: (lv2).toString(), // Số lượng trẻ em, mặc định là 0
+				tourId: tour.id.toString(), // ID tour từ props
+				tourName: tour.title, // Tên tour từ props
+				travelDate: dayjs(values?.travelDate).format("YYYY-MM-DD"), // Ngày đi
+				customerId: customerId, // Mặc định ID khách hàng là 1
+			};
+			const res = await orderTourService(orderData);
+			// api.success({
+			// 	message: "Đặt tour thành công",
+			// });
 
-			// console.log({ res });
+			console.log(res);
 			//  lây id booking từ res (api trả về khi tạo booking)
-			const resPayment = await paymentSubmitOrderService("14");
-			window.location.href = resPayment;
+			if (paymentMethod === 1) {
+				const resPayment = await paymentSubmitOrderService(res);
+				window.location.href = resPayment;
+			}
 			api.open({
 				message: "Đặt Tour",
 				description: "Đặt tour thành công",
 				showProgress: true,
 				pauseOnHover: true,
 			});
+
 		} catch (error) {
 			console.error(error);
 		}
@@ -101,20 +110,20 @@ const OrderTour = ({ tour }: IProps) => {
 				<Typography.Title level={3}>{tour?.title}</Typography.Title>
 				<div className="grid grid-cols-5">
 					<div className="col-span-2">
-						<Image src="https://dulichviet.com.vn/images/bandidau/NOI-DIA/Quy-Nhon/du-lich-quy-nhon-eo-gio-du-lich-viet.jpg" />
+						<Image src={tour.imgUrl ?? "https://dulichviet.com.vn/images/bandidau/NOI-DIA/Quy-Nhon/du-lich-quy-nhon-eo-gio-du-lich-viet.jpg"} />
 					</div>
 					<div className="col-span-3 text-gray-700 flex flex-col gap-5 px-10">
 						<p>
 							<strong>Thời gian:</strong> 5 ngày
 						</p>
 						<p>
-							<strong>Giá:</strong> 7,999,000 ₫
+							<strong>Giá:</strong> {formatPrice(tour.price_aldults)}
 						</p>
 						<p>
-							<strong>Ngày khởi hành:</strong> 31/12/2024
+							<strong>Ngày khởi hành:</strong> {tour.startDate}
 						</p>
 						<p>
-							<strong>Nơi khởi hành:</strong> Hồ Chí Minh
+							<strong>Nơi khởi hành:</strong> {tour.departure}
 						</p>
 						<p>
 							<strong>Số chỗ còn nhận:</strong> 10
@@ -182,12 +191,7 @@ const OrderTour = ({ tour }: IProps) => {
 						<Typography.Title level={3}>THÔNG TIN LIÊN HỆ</Typography.Title>
 					</div>
 					<div className="grid grid-cols-2 gap-6">
-						<Form.Item label="Họ Tên" name="customerName" required>
-							<Input placeholder="Họ Tên" />
-						</Form.Item>
-						<Form.Item label="Email">
-							<Input placeholder="Email" />
-						</Form.Item>
+						
 						<Form.Item label="Số điện thoại">
 							<Input placeholder="Số điện thoại" />
 						</Form.Item>
@@ -239,7 +243,7 @@ const OrderTour = ({ tour }: IProps) => {
 							PHƯƠNG THỨC THANH TOÁN
 						</Typography.Title>
 					</div>
-					<Form.Item>
+					<Form.Item name="method" rules={[{ required: true, message: 'Vui lòng chọn phương thức thanh toán' }]}>
 						<Radio.Group className="grid grid-cols-2">
 							{optionPayment?.map((o) => (
 								<Radio key={o.value} value={o.value} className="mb-5">

@@ -7,12 +7,14 @@ import ReviewTour from "@/components/RevewTour";
 import ScheduleTour from "@/components/ScheduleTour";
 import { formatPrice } from "@/helper/func";
 import useCallApi from "@/hooks/useCallApi";
-import { getTourDetailService } from "@/services/tour";
+import { favoriteTourService, getTourByAIService, getTourDetailService } from "@/services/tour";
 import { CheckCircleOutlined, EyeOutlined } from "@ant-design/icons";
-import { Button, Col, Image, Rate, Row, Typography } from "antd";
+import { Button, Col, Image, notification, Rate, Row, Tour, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import OrderTour from "./OrderTour";
+import CardTourRecom from "@/components/CardTourRecom";
+import TourRecommendations from "@/components/layout/TourRecom";
 
 const dataInit: any[] = [
 	{
@@ -155,8 +157,8 @@ const dataExperience = [
 ];
 const TourDetail = () => {
 	const { id } = useParams();
+	const [api, contextHolder] = notification.useNotification();
 	const [showOrderTour, setShowOrderTour] = useState(false);
-
 	const { data, callApi } = useCallApi({
 		func: async () => {
 			if (!id) return;
@@ -164,8 +166,21 @@ const TourDetail = () => {
 		},
 	});
 
+	const handleFavorite = async () => {
+		try {
+			await favoriteTourService(id ?? '');
+			api.success({ message: 'Đã thêm vào danh sách yêu thích' })
+		} catch (error) {
+			console.log({ error })
+		}
+	}
+
+	const { data: tourByAI, callApi: callApiGetTourByAI } = useCallApi({
+		func: getTourByAIService,
+	});
 	useEffect(() => {
 		callApi();
+		callApiGetTourByAI()
 	}, [id]);
 
 	if (showOrderTour) {
@@ -174,22 +189,30 @@ const TourDetail = () => {
 
 	return (
 		<Container>
-			<Typography.Title level={3}>
-				{(data as ITourDetail)?.title}
-			</Typography.Title>
-			<div className="flex items-center gap-5 mb-5">
-				<Rate allowHalf defaultValue={2.5} />
-				<p>
-					<strong>4.9/5</strong> trong <strong>40</strong> ĐÁNH GIÁ
-					<EyeOutlined className="ml-2" /> 1,794
-				</p>
+			{contextHolder}
+			<div className="flex justify-between items-center">
+				<div>
+					<Typography.Title level={3}>
+						{(data as ITourDetail)?.title}
+					</Typography.Title>
+					<div className="flex items-center gap-5 mb-5">
+						<Rate allowHalf defaultValue={2.5} />
+						<p>
+							<strong>4.9/5</strong> trong <strong>40</strong> ĐÁNH GIÁ
+							<EyeOutlined className="ml-2" /> 1,794
+						</p>
+					</div>
+
+
+				</div>
+				<Button type="primary" onClick={handleFavorite}>Thêm vào danh sách yêu thích</Button>
 			</div>
 			<Row>
 				<Col xl={18}>
 					<Image
 						className="rounded-lg"
 						preview={false}
-						src="https://dulichviet.com.vn/images/bandidau/NOI-DIA/Quy-Nhon/du-lich-quy-nhon-eo-gio-du-lich-viet.jpg"
+						src={(data as ITourDetail)?.imgUrl}
 					/>
 					<div className="mt-6">
 						<Typography.Title level={3}>Điểm nhấn hành trình</Typography.Title>
@@ -197,7 +220,7 @@ const TourDetail = () => {
 							<span className="space-x-3">
 								<Typography.Text strong>Hành trình:</Typography.Text>
 								<Typography.Text>
-									Quy Nhơn-Phú Yên-Mũi Điện-Gành Đá Dĩa-Kỳ Co-Eo Gió
+									{(data as ITourDetail)?.schedule}
 								</Typography.Text>
 							</span>
 							<span className="space-x-3">
@@ -207,7 +230,7 @@ const TourDetail = () => {
 							<span className="space-x-3">
 								<Typography.Text strong>Ngày khởi hành:</Typography.Text>
 								<Typography.Text>
-									05,12,19,26/10; 02,09,16,23,30/11; 07,14,21/12/2024
+									{(data as ITourDetail)?.startDate}
 								</Typography.Text>
 							</span>
 							<span className="space-x-3">
@@ -219,28 +242,7 @@ const TourDetail = () => {
 						</div>
 
 						<Typography.Paragraph className="mt-8">
-							<strong>Du lịch Quy Nhơn</strong> là một địa điểm du lịch nổi
-							tiếng ở miền Trung, du lịch Quy Nhơn thành phố ven biển thuộc tỉnh
-							Bình Định với cảnh sắc tuyệt đẹp, được bao quanh bởi nhiều bãi cát
-							trắng hoang sơ, những ngọn núi xanh tươi bát ngát và những hòn đảo
-							yên bình. Không giống như những bãi biển nhộn nhịp khác ở Vũng Tàu
-							hay Nha Trang, Quy Nhơn lại là một bãi biển thiên đường du lịch
-							mang vẻ đẹp yên bình với làn nước trong vắt. Hãy cùng Du Lịch Việt
-							khám phá vẻ đẹp cùng những trải nghiệm thú vị tại Quy Nhơn mà du
-							khách sẽ được trải nghiệm khi đến với thiên đường du lịch mùa Thu
-							trong nước tại đây. Đón bình minh trên Eo Gió Nằm trên địa bàn
-							thuộc xã Nhơn Lý, cách thành phố Quy Nhơn khoảng 20km, Eo Gió là
-							địa danh mà bất cứ ai khi đến du lịch Quy Nhơn cũng đều muốn đến
-							thăm, đừng trước khung cảnh tuyệt đẹp tại Eo gió du khách sẽ chỉ
-							muốn thả dáng và check-in. Từ mỏm đá trên cao khung cảnh nhìn
-							xuống, bạn thu vào tầm mắt một eo biển nhỏ thật bình yên được ôm
-							ấp trong dãy núi, như một vòng tay ôm đang ôm gọn bờ biển. Ghé
-							thăm Eo Gió trong tiết trời se se lạnh của một buổi sáng sớm tinh
-							mơ mùa Thu săn ánh bình minh là một trải nghiệm đi tour mùa Thu
-							Quy Nhơn nhất định bạn phải lưu giữ. Lắng nghe tiếng sóng biển xô,
-							cùng tiếng gió vi vu nhẹ nhàng như khúc tình ca, ngắm nhìn ánh mặt
-							trời ló dạng, vén dần màn sương mờ ảo huyền diệu trên biển thì
-							thật tuyệt vời biết bao.
+							{(data as ITourDetail)?.description}
 						</Typography.Paragraph>
 					</div>
 
@@ -253,21 +255,32 @@ const TourDetail = () => {
 					<div className="pl-5 flex flex-col gap-y-5">
 						<div className="px-6 py-4 border border-solid border-gray-900 rounded-lg">
 							<span className="text-sm font-bold text-primary_color leading-6">
-								Du lịch mùa Thu - Tour Du lịch Quy Nhơn - Phú Yên từ Sài Gòn
-								2024
+								{(data as ITourDetail)?.schedule}
 							</span>
 							<ul className="mt-5">
-								{dataTour.map((i, index) => (
-									<li
-										key={index}
-										className="flex gap-x-3 py-3 px-1 border-t border-solid border-gray-800"
-									>
-										<strong>{i.label}: </strong>
-										<p className="flex-1">{i.value}</p>
-									</li>
-								))}
+								<li className="flex gap-x-3 py-3 px-1 border-t border-solid border-gray-800">
+									<strong>Mã tour: </strong>
+									<p className="flex-1">{(data as ITourDetail)?.id}</p>
+								</li>
+								<li className="flex gap-x-3 py-3 px-1 border-t border-solid border-gray-800">
+									<strong>Thời gian: </strong>
+									<p className="flex-1">4 ngày 3 đêm</p> {/* Bạn có thể thay đổi theo logic nếu cần */}
+								</li>
+								<li className="flex gap-x-3 py-3 px-1 border-t border-solid border-gray-800">
+									<strong>Khởi hành: </strong>
+									<p className="flex-1">{(data as ITourDetail)?.startDate}</p>
+								</li>
+								<li className="flex gap-x-3 py-3 px-1 border-t border-solid border-gray-800">
+									<strong>Vận Chuyển: </strong>
+									<p className="flex-1">Xe du lịch, Máy bay</p> {/* Cập nhật thêm nếu cần */}
+								</li>
+								<li className="flex gap-x-3 py-3 px-1 border-t border-solid border-gray-800">
+									<strong>Xuất phát: </strong>
+									<p className="flex-1">{(data as ITourDetail)?.departure}</p>
+								</li>
 							</ul>
 						</div>
+
 
 						<div className="bg-primary_color px-1 rounded-md ">
 							<div className="text-white space-x-1 px-2 py-4">
@@ -304,19 +317,16 @@ const TourDetail = () => {
 				</Col>
 			</Row>
 			{/* AI tour */}
+			<Typography.Title className="mt-3" level={3}>
+						Có thể bạn sẽ thích
+					</Typography.Title>
 			<div className="mt-5">
-				<ListScrollHorizontal>
-					<div className="flex gap-5">
-						{dataInit.map((i) => (
-							<CardTour tour={i} />
-						))}
-					</div>
-				</ListScrollHorizontal>
+				<TourRecommendations />
 			</div>
 
 			<div className="mt-16">
 				<Typography.Title level={3}>Đánh giá</Typography.Title>
-				<ReviewTour idTour="1" />
+				<ReviewTour idTour={id} />
 			</div>
 		</Container>
 	);

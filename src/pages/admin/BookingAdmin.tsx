@@ -3,6 +3,8 @@ import ModalHandleTourAdmin from "@/components/ModalHandleTourAdmin";
 import useCallApi from "@/hooks/useCallApi";
 import { getAllTourService } from "@/services/tour";
 import { Button, Table, TableColumnsType, Typography } from "antd";
+import { SearchProps } from "antd/es/input";
+import Search from "antd/es/transfer/search";
 import { useEffect, useState } from "react";
 
 const BookingAdmin = () => {
@@ -52,6 +54,8 @@ const BookingAdmin = () => {
 		},
 	];
 
+	const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
+
 	useEffect(() => {
 		callApi();
 	}, []);
@@ -65,9 +69,15 @@ const BookingAdmin = () => {
 			/>
 			<div className="flex justify-between items-center mb-10">
 				<Typography.Title level={3}>Quản lý đặt tour</Typography.Title>
-				<Button type="primary" onClick={() => setValueModal({ open: true })}>
-					Tạo Tour
-				</Button>
+
+				<div className="flex gap-8">
+					<div className="w-[400px]">
+						<Search placeholder="input search text" onChange={() => { }} />
+					</div>
+					<Button type="primary" onClick={() => setValueModal({ open: true })}>
+						Tạo Tour
+					</Button>
+				</div>
 			</div>
 
 			<Table<ITourDetail>

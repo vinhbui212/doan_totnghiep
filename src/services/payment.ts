@@ -8,3 +8,4 @@ export const paymentSubmitOrderService = (id?: string) => {
 export const paymentGetAllService = () => {
 	return axiosCreatesForme.get(`/payment/all`) as any;
 };
+

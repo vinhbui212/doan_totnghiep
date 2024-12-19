@@ -23,6 +23,10 @@ const routers: RouteObject[] = [
 				Component: HomePage,
 			},
 			{
+				path: paths.homePage,
+				Component: HomePage,
+			},
+			{
 				path: paths.ticketsAirline,
 				Component: TicketAirline,
 			},

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ITourDetail } from "@/common/types/tour";
+import { formatDate } from "@/helper/func";
 import {
 	createTourService,
 	deleteTourService,
@@ -8,6 +9,7 @@ import {
 import { Button, DatePicker, Form, Input, Modal, notification } from "antd";
 import dayjs from "dayjs";
 import { useEffect } from "react";
+
 
 interface IProps {
 	valueModal?: {
@@ -36,6 +38,7 @@ const ModalHandleTourAdmin = ({
 			await createTourService(values);
 			api.success({ message: "Tạo tour thành công" });
 			callbackSuccess?.();
+			setValueModal({ open: false });
 		} catch (error) {
 			console.error(error);
 		}
@@ -43,9 +46,10 @@ const ModalHandleTourAdmin = ({
 	const handleUpdateTour = async () => {
 		const values = form.getFieldsValue();
 		try {
-			await updateTourService({ ...values, id: valueModal?.tour?.id });
+			await updateTourService({ ...values, id: valueModal?.tour?.id, endDate: dayjs(values.endDate).format("YYYY-MM-DDTHH:mm:ss"), startDate: dayjs(values.startDate).format("YYYY-MM-DDTHH:mm:ss") });
 			api.success({ message: "Chỉnh sửa tour thành công" });
 			callbackSuccess?.();
+			setValueModal({ open: false });
 		} catch (error) {
 			console.error(error);
 		}
@@ -56,6 +60,7 @@ const ModalHandleTourAdmin = ({
 			await deleteTourService(valueModal?.tour?.id);
 			api.success({ message: "Xóa tour thành công" });
 			callbackSuccess?.();
+			setValueModal({ open: false });
 		} catch (error) {
 			console.error(error);
 		}

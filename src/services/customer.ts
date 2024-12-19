@@ -3,10 +3,17 @@ import { axiosCreatesForme } from "@/api/configApi";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const updateCustomerService = (body: any) => {
 	const customerId = localStorage.getItem("customerId");
-	return axiosCreatesForme.post(`/customers/update-info?email=${body.email}`, {
+	return axiosCreatesForme.put(`/customers/update-info?email=${body.email}`, {
 		...body,
 		customerId,
 	});
+};
+
+export const getInfoService = async () => {
+	// const customerId = 1;
+	return (await axiosCreatesForme.get(
+		`/customers/info`
+	)) as any;
 };
 
 export const getOrderService = async () => {

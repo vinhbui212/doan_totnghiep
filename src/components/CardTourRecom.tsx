@@ -52,14 +52,12 @@ const CardTourRecom = (props: IProps) => {
 				<ItemDes icon={<CalendarOutlined />} label={formatDate(props.tour?.startDate)} />
 				<ItemDes icon={<ClockCircleOutlined />} label={formatDate(props.tour?.endDate)} />
 
-				<div className="text-right">
-					<span className="line-through text-gray-400 text-sm mr-2">
-						{formatPrice(props.tour?.price_aldults*1.5, props.tour.priceCurrency)}
-					</span>
-					<span className="text-red-600 text-lg font-bold">
-						{formatPrice(props.tour?.price_aldults, props.tour.priceCurrency)}
-					</span>
-				</div>
+				{/* <button
+					className="mt-4 p-2 bg-blue-500 text-white rounded"
+					onClick={() => navigate(`/tour/${props.tour.id}`)}
+				>
+					Xem chi tiết
+				</button> */}
 			</div>
 		</div>
 	);

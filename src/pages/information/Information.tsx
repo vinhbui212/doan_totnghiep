@@ -4,6 +4,7 @@ import useCallApi from "@/hooks/useCallApi";
 import { paths } from "@/router/path";
 import {
 	getFavoriteService,
+	getInfoService,
 	getOrderService,
 	updateCustomerService,
 } from "@/services/customer";
@@ -22,6 +23,7 @@ import {
 	TableColumnsType,
 	Typography,
 } from "antd";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -35,6 +37,38 @@ const Information = () => {
 	const { data: dataFavorite, callApi: callApiGetFavorite } = useCallApi({
 		func: getFavoriteService,
 	});
+
+	const getInfoService = async () => {
+		try {
+		  const token = localStorage.getItem("token"); // Hoặc lấy từ cookies tùy theo cách lưu trữ token
+		  const response = await axios.get("http://localhost:8080/api/customers/info", {
+			headers: {
+			  Authorization: `Bearer ${token}`,  // Đảm bảo token được truyền trong header
+			},
+		  });
+		  return response.data;  // Dữ liệu trả về là thông tin khách hàng
+		} catch (error) {
+		  console.error("Error fetching customer info", error);
+		  throw error;  // Thông báo lỗi nếu có
+		}
+	  };
+	
+
+	  useEffect(() => {
+		const fetchCustomerInfo = async () => {
+		  try {
+			const data = await getInfoService();  // Gọi API để lấy thông tin
+			form.setFieldsValue(data);  // Điền dữ liệu vào form
+		  } catch (error) {
+			notification.error({
+			  message: "Lỗi khi lấy thông tin khách hàng",
+			  description: "Không thể lấy thông tin khách hàng từ server.",
+			});
+		  }
+		};
+	
+		fetchCustomerInfo();
+	  }, [form]);
 
 	const initTab = [
 		{ label: "Hồ sơ cá nhân", icon: <UserOutlined />, key: 0 },
@@ -67,6 +101,7 @@ const Information = () => {
 	useEffect(() => {
 		callApi();
 		callApiGetFavorite();
+		
 	}, []);
 
 	const Content = () => {
@@ -78,7 +113,7 @@ const Information = () => {
 						<Form form={form} layout="vertical">
 							<div className="grid grid-cols-2 gap-5">
 								<Form.Item label="Email" name="email" required>
-									<Input placeholder="Email" />
+									<Input placeholder="Email"  />
 								</Form.Item>
 								<Form.Item label="Họ" name="firstName">
 									<Input placeholder="Họ" />
@@ -160,7 +195,7 @@ const Information = () => {
 									<img
 										className="w-[100px]"
 										src={
-											// f?.img_Url ??
+											f?.img_Url ??
 											"https://dulichviet.com.vn/images/bandidau/NOI-DIA/Quy-Nhon/du-lich-quy-nhon-mua-thu-du-lich-viet-2024.jpg"
 										}
 									/>

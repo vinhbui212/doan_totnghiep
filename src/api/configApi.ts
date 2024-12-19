@@ -12,7 +12,7 @@ const axiosCreates = axios.create({
 });
 
 const axiosCreatesForme = axios.create({
-	baseURL: "https://backendptit.azurewebsites.net/api/",
+	baseURL: "http://localhost:8080/api/",
 });
 
 axiosCreatesForme.interceptors.request.use((config) => {
