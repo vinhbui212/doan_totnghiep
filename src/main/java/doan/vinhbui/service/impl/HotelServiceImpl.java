@@ -47,6 +47,7 @@ public class HotelServiceImpl implements HotelService {
 
     public HotelDTO convertToDto(Hotel hotel) {
         HotelDTO hotelDTO = new HotelDTO();
+        hotelDTO.setId(hotel.getId());
         hotelDTO.setAddress(hotel.getAddress());
         hotelDTO.setPricePerNight(hotel.getPricePerNight());
         hotelDTO.setName(hotel.getName());

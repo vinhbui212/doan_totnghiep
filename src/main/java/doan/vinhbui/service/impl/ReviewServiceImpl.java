@@ -73,7 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
                 return new ArrayList<>();
             }
             Tour product = optionalProduct.get();
-            List<Review> reviews = reviewRepository.findByTour(product);
+            List<Review> reviews = reviewRepository.findByTourId(product.getId());
 
             if (optionalCustomer.isPresent()) {
                 Customer customer = optionalCustomer.get();

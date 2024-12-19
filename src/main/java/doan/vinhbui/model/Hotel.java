@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "hotel",uniqueConstraints = @UniqueConstraint(columnNames = "hotel_name"))
+@Table(name = "hotel")
 @Data
 public class Hotel {
     @Id

@@ -31,6 +31,7 @@ public class FlightServiceImpl implements FlightService {
     }
     public FlightDTO convertToDto(Flight flight){
         FlightDTO flightDTO =new FlightDTO();
+        flightDTO.setId(flight.getFltID());
         flightDTO.setStartPoint(flight.getStartPoint());
         flightDTO.setEndPoint(flight.getEndPoint());
         flightDTO.setStartTime(flight.getEndTime());

@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/bookings")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"http://localhost:5173/","http://localhost:3000/"})
+
 public class BookingController {
 
     @Autowired
@@ -29,11 +31,10 @@ public class BookingController {
 
     @PostMapping("")
     public ResponseEntity<String> createBooking(@RequestBody BookingDTO bookingDTO) throws Exception {
-        Booking booking = bookingService.addnewBooking(bookingDTO);
+        String booking = bookingService.addnewBooking(bookingDTO);
         // Gửi email sau khi tạo booking
-        bookingService.sendBookingConfirmation(booking.getCustomer().getEmail(), booking);
 
-        return ResponseEntity.ok("Booking created and confirmation email sent.");
+        return ResponseEntity.ok(booking);
     }
 
     // Lấy tất cả các booking cho admin (bao gồm cả các booking đã hủy)

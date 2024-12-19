@@ -15,5 +15,10 @@ public interface TourService {
     Tour updateTour(TourDTO tourDTO,long tour_id) throws DataNotFoundException;
     String deleteTour(long tour_id);
     TourDTO getTourById(long tour_id);
+
+    List<TourDTO> getToursByIds(List<Long> tourIds);
+
     Page<TourDTO> findAllTour(Pageable pageable);
+
+    Page<TourDTO> findAllTourAbroad(Pageable pageable);
 }

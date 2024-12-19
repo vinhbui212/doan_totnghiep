@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/flights")
 @AllArgsConstructor
+@CrossOrigin(origins = {"http://localhost:5173/","http://localhost:3000/"})
+
 public class FlightController {
 
     private final FlightService flightService;
@@ -35,7 +38,7 @@ public class FlightController {
 
     // Lấy tất cả đặt chỗ với phân trang
     @GetMapping("/bookings")
-    public ResponseEntity<?> getAllBookings(@RequestHeader("Authorization") String authorizationHeader, Pageable pageable) {
+    public ResponseEntity<?> getAllBookings(@RequestHeader("Authorization") String authorizationHeader,@PageableDefault Pageable pageable) {
         // Kiểm tra token
         if (!permissions.checkToken(authorizationHeader)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");

@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface BookingService {
-    Booking addnewBooking(BookingDTO bookingDTO) throws Exception;
+    String addnewBooking(BookingDTO bookingDTO) throws Exception;
 
     Booking cancelBooking(Long bookingId, Long userId) throws DataNotFoundException, UnauthorizedException;
 

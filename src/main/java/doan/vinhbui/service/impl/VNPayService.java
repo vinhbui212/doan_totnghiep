@@ -4,10 +4,14 @@ package doan.vinhbui.service.impl;
 
 
 import doan.vinhbui.config.VNPayConfig;
+import doan.vinhbui.dto.PaymentDTO;
 import doan.vinhbui.model.Booking;
+import doan.vinhbui.model.Payment;
 import doan.vinhbui.repository.BookingRepository;
 import doan.vinhbui.repository.CustomerRepository;
+import doan.vinhbui.repository.PaymentRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +22,17 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class VNPayService {
     @Autowired
     public CustomerRepository customerRepository;
     @Autowired
     public BookingRepository bookingRepository;
-
+    @Autowired
+    public PaymentRepository paymentRepository;
     public String createOrder(Long orderId, String urlReturn){
         float total=0;
         Optional<Booking> orderOptional=bookingRepository.findById(orderId);
@@ -57,7 +64,7 @@ public class VNPayService {
         String locate = "vn";
         vnp_Params.put("vnp_Locale", locate);
 
-        urlReturn += VNPayConfig.vnp_Returnurl;
+        urlReturn = VNPayConfig.vnp_Returnurl;
         vnp_Params.put("vnp_ReturnUrl", urlReturn);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
@@ -104,9 +111,9 @@ public class VNPayService {
         return paymentUrl;
     }
 
-    public int orderReturn(HttpServletRequest request){
+    public int orderReturn(HttpServletRequest request) {
         Map fields = new HashMap();
-        for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
+        for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
             String fieldName = null;
             String fieldValue = null;
             try {
@@ -127,25 +134,55 @@ public class VNPayService {
         if (fields.containsKey("vnp_SecureHash")) {
             fields.remove("vnp_SecureHash");
         }
+        String amount = request.getParameter("vnp_Amount");
         String signValue = VNPayConfig.hashAllFields(fields);
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 String orderId = request.getParameter("vnp_OrderInfo");
-                Optional<Booking> order=bookingRepository.findById(Long.valueOf(orderId));
-                if(order.isPresent()){
-                    Booking order1=order.get();
-                    order1.setBookingDate(LocalDate.from(LocalDateTime.now()));
-                    order1.setStatus("Paid");
-                    bookingRepository.save(order1);
-                }
+                log.info(orderId);
+                Booking order = bookingRepository.findById(Long.valueOf(orderId)).orElseThrow();
+                if (order != null) {
+                    order.setBookingDate(LocalDate.from(LocalDateTime.now()));
+                    order.setStatus("Paid");
+                    bookingRepository.save(order);
 
-                return 1;
+                    Payment payment = new Payment();
+                    payment.setBooking(order);
+                    payment.setStatus("Paid");
+                    payment.setPayment_type("ATM");
+                    payment.setPayDate(LocalDateTime.now());
+                    payment.setAmount(Double.valueOf(amount));
+                    paymentRepository.save(payment);
+                    return 1;
+                }
             } else {
                 return 0;
             }
         } else {
             return -1;
         }
+        return 22;
+    }
+    public List<PaymentDTO> getAllPayment() {
+        // Lấy tất cả các payment từ paymentRepository
+        List<Payment> payments = paymentRepository.findAll();
+
+        // Chuyển đổi từng Payment thành PaymentDTO
+        List<PaymentDTO> paymentDTOs = payments.stream()
+                .map(this::maptoDTO) // Sử dụng phương thức maptoDTO để chuyển đổi
+                .collect(Collectors.toList()); // Thu thập thành List
+
+        return paymentDTOs;
     }
 
+    public PaymentDTO maptoDTO(Payment payment) {
+        PaymentDTO paymentDTO = new PaymentDTO();
+        paymentDTO.setId(payment.getId());
+        paymentDTO.setAmount(payment.getAmount());
+        paymentDTO.setPayDate(payment.getPayDate());
+        paymentDTO.setPayment_type(payment.getPayment_type());
+        paymentDTO.setBooking_id(payment.getBooking().getId());
+        paymentDTO.setStatus(payment.getStatus());
+        return paymentDTO;
+    }
 }

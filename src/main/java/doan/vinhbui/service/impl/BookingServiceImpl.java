@@ -33,7 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final EmailService emailService;
 
     @Override
-    public Booking addnewBooking(BookingDTO bookingDTO) throws Exception {
+    public String addnewBooking(BookingDTO bookingDTO) throws Exception {
         // Kiểm tra xem khách hàng đã đặt tour này chưa
         boolean bookingExists = bookingRepository.existsByCustomerIdAndTourId(
                 bookingDTO.getCustomerId(),
@@ -49,8 +49,8 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new RuntimeException("Tour not found with id: " + bookingDTO.getTourId()));
 
         // Kiểm tra ngày travelDate có hợp lệ không
-        if (bookingDTO.getTravelDate().isBefore(tour.getStartDate()) ||
-                bookingDTO.getTravelDate().isAfter(tour.getEndDate())) {
+        if (bookingDTO.getTravelDate().isBefore(tour.getStartDate())
+                ) {
             throw new IllegalArgumentException("Selected travel date is not available for the tour");
         }
 
@@ -72,11 +72,11 @@ public class BookingServiceImpl implements BookingService {
         int pricePerChild = (int) (tour.getPrice() * 0.5); // Trẻ em giảm giá 50%
         int totalPrice = (pricePerAdult * bookingDTO.getNumOfPeople()) + (pricePerChild * bookingDTO.getNumOfChildren());
         booking.setPrice(totalPrice);
-
         // Lưu booking vào cơ sở dữ liệu
         bookingRepository.save(booking);
+        sendBookingConfirmation(booking.getCustomer().getEmail(), booking);
 
-        return booking;
+        return booking.getId().toString();
     }
 
 
@@ -137,6 +137,7 @@ public class BookingServiceImpl implements BookingService {
         BookingDTO bookingDTO= new BookingDTO();
         bookingDTO.setCustomerName(booking.getCustomer().getName());
         bookingDTO.setCustomerId(booking.getCustomer().getId());
+        bookingDTO.setBookingDate(booking.getBookingDate());
         bookingDTO.setTourName(booking.getTour().getTitle());
         bookingDTO.setTourId(booking.getTour().getId());
         bookingDTO.setNumOfChildren(booking.getNumOfChildren());

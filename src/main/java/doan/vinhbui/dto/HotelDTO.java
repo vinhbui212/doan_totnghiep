@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HotelDTO {
+    private Long id;
     private double pricePerNight;
     private String name;
     private String address;

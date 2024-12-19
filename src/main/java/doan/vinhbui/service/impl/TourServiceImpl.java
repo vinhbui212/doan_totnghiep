@@ -5,8 +5,6 @@ import doan.vinhbui.Middleware.Permissions;
 import doan.vinhbui.dto.TourDTO;
 import doan.vinhbui.exception.DataNotFoundException;
 import doan.vinhbui.model.Tour;
-import doan.vinhbui.model.Hotel;
-import doan.vinhbui.repository.HotelRepositoty;
 import doan.vinhbui.repository.TourRepository;
 import doan.vinhbui.service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TourServiceImpl implements TourService {
@@ -48,6 +48,7 @@ public class TourServiceImpl implements TourService {
 
     private TourDTO convertToDto(Tour tour) {
         TourDTO tourDTO = new TourDTO();
+        tourDTO.setId(tour.getId());
         tourDTO.setDeparture(tour.getDeparture());
         tourDTO.setDestination(tour.getDestination());
         tourDTO.setAbroad(tour.isAboard());
@@ -81,63 +82,88 @@ public class TourServiceImpl implements TourService {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 
             }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
-            else{
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
-            }
+    }
+
+
+    @Override
+    public Tour updateTour(TourDTO tourDTO, long tourId) throws DataNotFoundException {
+        // Tìm tour theo id
+        Tour existingTour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new DataNotFoundException("Tour not found with id: " + tourId));
+
+        // Cập nhật thông tin tour từ DTO
+        existingTour.setTitle(tourDTO.getTitle());
+        existingTour.setDescription(tourDTO.getDescription());
+        existingTour.setPriceCurrency(tourDTO.getPriceCurrency());
+        existingTour.setStartDate(LocalDate.from(LocalDateTime.parse(tourDTO.getStartDate())));
+        existingTour.setEndDate(LocalDate.from(LocalDateTime.parse(tourDTO.getEndDate())));
+        existingTour.setAboard(tourDTO.isAbroad());
+        existingTour.setSchedule(tourDTO.getSchedule());
+        existingTour.setImgUrl(tourDTO.getImgUrl());
+        existingTour.setPrice(tourDTO.getPrice_aldults());
+        existingTour.setDeparture(tourDTO.getDeparture());
+        existingTour.setDestination(tourDTO.getDestination());
+        return tourRepository.save(existingTour);
+    }
+
+    @Override
+    public String deleteTour(long tourId) {
+        // Kiểm tra sự tồn tại của tour trước khi xóa
+        Optional<Tour> tourOptional = tourRepository.findById(tourId);
+        if (tourOptional.isPresent()) {
+            tourRepository.deleteById(tourId);
+            return "Tour deleted successfully.";
+        } else {
+            return "Tour not found with id: " + tourId;
         }
+    }
+
+    @Override
+    public TourDTO getTourById(long tour_id) {
+        Tour tour = tourRepository.findById(tour_id).orElseThrow();
+
+        return convertToDto(tour);
+    }
+
+    @Override
+    public List<TourDTO> getToursByIds(List<Long> tourIds) {
+        // Lấy danh sách các Tour từ repository dựa trên danh sách tourIds
+        List<Tour> tours = tourRepository.findAllById(tourIds);
+
+        // Chuyển đổi danh sách Tour thành danh sách TourDTO
+        List<TourDTO> tourDTOs = tours.stream()
+                .map(this::convertToDto) // Giả sử bạn có phương thức convertToDto(Tour tour)
+                .collect(Collectors.toList());
+
+        return tourDTOs;
+    }
 
 
-            @Override
-            public Tour updateTour (TourDTO tourDTO,long tourId) throws DataNotFoundException {
-                // Tìm tour theo id
-                Tour existingTour = tourRepository.findById(tourId)
-                        .orElseThrow(() -> new DataNotFoundException("Tour not found with id: " + tourId));
+    @Override
+    public Page<TourDTO> findAllTour(Pageable pageable) {
+        // Lấy tất cả các tour theo trang
+        Page<Tour> tours = tourRepository.findAll(pageable);
 
-                // Cập nhật thông tin tour từ DTO
-                existingTour.setTitle(tourDTO.getTitle());
-                existingTour.setDescription(tourDTO.getDescription());
-                existingTour.setPriceCurrency(tourDTO.getPriceCurrency());
-                existingTour.setStartDate(LocalDate.from(LocalDateTime.parse(tourDTO.getStartDate())));
-                existingTour.setEndDate(LocalDate.from(LocalDateTime.parse(tourDTO.getEndDate())));
-                existingTour.setAboard(tourDTO.isAbroad());
-                existingTour.setSchedule(tourDTO.getSchedule());
-                existingTour.setImgUrl(tourDTO.getImgUrl());
-                existingTour.setPrice(tourDTO.getPrice_aldults());
-                existingTour.setDeparture(tourDTO.getDeparture());
-                existingTour.setDestination(tourDTO.getDestination());
-                return tourRepository.save(existingTour);
-            }
+        // Chuyển đổi từ Page<Tour> sang Page<TourDTO> bằng cách sử dụng hàm convertToDto
+        Page<TourDTO> tourDTOPage = tours.map(this::convertToDto);
 
-            @Override
-            public String deleteTour ( long tourId){
-                // Kiểm tra sự tồn tại của tour trước khi xóa
-                Optional<Tour> tourOptional = tourRepository.findById(tourId);
-                if (tourOptional.isPresent()) {
-                    tourRepository.deleteById(tourId);
-                    return "Tour deleted successfully.";
-                } else {
-                    return "Tour not found with id: " + tourId;
-                }
-            }
+        return tourDTOPage;
+    }
 
-            @Override
-            public TourDTO getTourById ( long tour_id){
-                Tour tour = tourRepository.findById(tour_id).orElseThrow();
+    @Override
+    public Page<TourDTO> findAllTourAbroad(Pageable pageable) {
+        // Lấy tất cả các tour có is_abroad = 1 theo trang
+        Page<Tour> tours = tourRepository.findAllByIsAboard(true, pageable);
 
-                return convertToDto(tour);
-            }
+        // Chuyển đổi từ Page<Tour> sang Page<TourDTO> bằng cách sử dụng hàm convertToDto
+        Page<TourDTO> tourDTOPage = tours.map(this::convertToDto);
 
-            @Override
-            public Page<TourDTO> findAllTour (Pageable pageable){
-                // Lấy tất cả các tour theo trang
-                Page<Tour> tours = tourRepository.findAll(pageable);
-
-                // Chuyển đổi từ Page<Tour> sang Page<TourDTO> bằng cách sử dụng hàm convertToDto
-                Page<TourDTO> tourDTOPage = tours.map(this::convertToDto);
-
-                return tourDTOPage;
-            }
+        return tourDTOPage;
+    }
 
 
-        }
+
+}

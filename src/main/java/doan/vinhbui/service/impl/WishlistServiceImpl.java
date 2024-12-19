@@ -48,6 +48,8 @@ public class WishlistServiceImpl implements WishlistService {
                 Wishlist wishlist = new Wishlist();
                 wishlist.setTour(tour);
                 wishlist.setCustomer(customer);
+                wishlist.setImgUrl(tour.getImgUrl());
+                wishlist.setDetail(tour.getDescription());
                 return wishlistRepository.save(wishlist);
             }
         }

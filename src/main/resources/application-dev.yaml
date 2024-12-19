@@ -4,6 +4,7 @@ spring:
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,3 +22,11 @@ spring:
       mail.smtp.starttls.enable: true
       mail.smtp.starttls.required: true
     default-encoding: UTF-8
+
+  springdoc:
+    swagger-ui:
+      path: /swagger-ui.html
+    api-docs:
+      version: openapi_3_0
+
+

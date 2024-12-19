@@ -16,11 +16,11 @@ import java.util.Date;
 public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer fltID;
+    private Long fltID;
     private String startPoint;
     private String endPoint;
-    private Date startTime;
-    private Date endTime;
+    private LocalDate startTime;
+    private LocalDate endTime;
     private String classOfService;
     private Double fltPrice;
     private String fltPriceCurrency;

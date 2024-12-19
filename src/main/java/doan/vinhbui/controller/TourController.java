@@ -16,11 +16,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 
 @RestController
 @RequestMapping("/api/tours")
+@CrossOrigin(origins = {"http://localhost:5173/","http://localhost:3000/"})
+
 public class TourController {
 
     @Autowired
@@ -135,6 +138,23 @@ public class TourController {
         }
     }
 
+    @PostMapping("/tours")
+    public ResponseEntity<List<TourDTO>> getToursByIds(@RequestBody List<Long> tourIds) {
+        try {
+            // Lấy tất cả các TourDTO tương ứng với danh sách tourIds
+            List<TourDTO> tourDTOs = tourService.getToursByIds(tourIds);
+
+            if (tourDTOs.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            return ResponseEntity.ok(tourDTOs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
     @GetMapping
     public ResponseEntity<org.springframework.data.domain.Page<TourDTO>> getAllTours(
             @RequestParam(defaultValue = "0") int page, // Số trang bắt đầu từ 0
@@ -146,6 +166,11 @@ public class TourController {
 
         // Trả về danh sách các tour cùng với mã trạng thái 200 OK
         return ResponseEntity.ok(tours);
+    }
+
+    @GetMapping("/abroad")
+    public Page<TourDTO> getTourAbroad(Pageable pageable) {
+        return tourService.findAllTourAbroad(pageable);
     }
 }
 

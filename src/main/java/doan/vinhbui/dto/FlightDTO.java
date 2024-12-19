@@ -10,10 +10,11 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FlightDTO {
+    private Long id;
     private String startPoint;
     private String endPoint;
-    private Date startTime;
-    private Date endTime;
+    private LocalDate startTime;
+    private LocalDate endTime;
     private String classOfService;
     private Double fltPrice;
     private String fltPriceCurrency;

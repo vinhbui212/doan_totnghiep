@@ -13,6 +13,7 @@ import java.util.Date;
 @Data
 public class TourDTO {
 
+    private Long id;
     private String title;
     private String description;
     private String priceCurrency;

@@ -15,4 +15,6 @@ public interface ReviewRepository extends JpaRepository<Review, CustomerTourPK> 
     List<Review> findByTour(Tour tour);
 
     Review findByCustomerAndTour(Customer customer, Tour tour);
+
+    List<Review> findByTourId(Long tourId);
 }
