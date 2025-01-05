@@ -7,6 +7,7 @@ import random
 from sqlalchemy import create_engine
 from flask_cors import CORS  # Import CORS
 from sklearn.metrics import mean_squared_error
+
 # Tạo ứng dụng Flask
 app = Flask(__name__)
 CORS(app)
@@ -48,7 +49,12 @@ X = pivot_df.values
 # Khởi tạo mô hình Nearest Neighbors
 model = NearestNeighbors(metric='cosine', algorithm='brute')
 model.fit(X)
-def evaluate_knn(customer_id, n_neighbors=6):
+
+
+##
+
+
+def evaluate_knn_rmse(customer_id, n_neighbors=5):
     if customer_id not in pivot_df.index:
         return {"error": "Customer not found"}
     
@@ -69,14 +75,17 @@ def evaluate_knn(customer_id, n_neighbors=6):
     y_true = true_ratings[common_tours]
     y_pred = predicted_ratings[common_tours]
     
-    # Tính MSE
-    mse = mean_squared_error(y_true, y_pred) /10
-    return {"MSE": mse}
+    # Tính RMSE
+    mse = mean_squared_error(y_true, y_pred)
+    rmse = np.sqrt(mse)
+    return {"RMSE": rmse}
 
-# Gọi hàm đánh giá cho khách hàng cụ thể
-customer_id = 1  # ID của khách hàng
-result = evaluate_knn(customer_id) 
-print("Kết quả đánh giá MSE:", result)
+# Gọi hàm evaluate_knn_rmse với một ID khách hàng cụ thể
+customer_id = 5  # ID của khách hàng
+result = evaluate_knn_rmse(customer_id) 
+print("Kết quả đánh giá RMSE:", result)
+
+    
 # API để gợi ý tour cho khách hàng
 @app.route('/recommend', methods=['GET'])
 def recommend():
