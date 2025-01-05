@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingDTO {
+    private Long id;
     private Long customerId;
     private String customerName;
     private LocalDate bookingDate;
@@ -22,6 +23,7 @@ public class BookingDTO {
     private Long tourId;
     private String tourName;
     private LocalDate travelDate;
+
 
 
 

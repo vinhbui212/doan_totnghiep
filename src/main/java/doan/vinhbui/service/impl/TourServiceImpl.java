@@ -70,22 +70,37 @@ public class TourServiceImpl implements TourService {
         if (permissions.checkToken(authorizationHeader)) {
             String token = authorizationHeader.substring(7);
             try {
-                // verify admin
-                if (!permissions.checkAdmin(token)) { // unauthorized user
+                // Kiểm tra quyền admin
+                if (!permissions.checkAdmin(token)) {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
                 }
-                // Chuyển đổi DTO sang Entity và lưu vào database
-                Tour tour = convertToEntity(tourDTO);
-                tourRepository.save(tour);
+
+                // Tạo đối tượng Tour từ DTO
+                Tour newTour = new Tour();
+                newTour.setTitle(tourDTO.getTitle());
+                newTour.setDescription(tourDTO.getDescription());
+                newTour.setPriceCurrency(tourDTO.getPriceCurrency());
+                newTour.setStartDate(LocalDate.from(LocalDateTime.parse(tourDTO.getStartDate())));
+                newTour.setEndDate(LocalDate.from(LocalDateTime.parse(tourDTO.getEndDate())));
+                newTour.setAboard(tourDTO.isAbroad());
+                newTour.setSchedule(tourDTO.getSchedule());
+                newTour.setImgUrl(tourDTO.getImgUrl());
+                newTour.setPrice(tourDTO.getPrice_aldults());
+                newTour.setDeparture(tourDTO.getDeparture());
+                newTour.setDestination(tourDTO.getDestination());
+
+                // Lưu đối tượng Tour vào cơ sở dữ liệu
+                tourRepository.save(newTour);
                 return ResponseEntity.status(HttpStatus.OK).body("Add tour successful");
+
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
     }
+
 
 
     @Override
@@ -164,6 +179,16 @@ public class TourServiceImpl implements TourService {
         return tourDTOPage;
     }
 
+    @Override
+    public List<TourDTO> getToursByTop() {
+        List<Tour> topTours = tourRepository.findTop7ByHighestRating()
+                .stream()
+                .limit(7)
+                .collect(Collectors.toList());
+        return topTours.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
 
 
 }

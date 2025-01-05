@@ -13,16 +13,23 @@ import java.util.List;
 
 public interface TourRepository extends JpaRepository<Tour,Long> {
     @Query("SELECT t FROM Tour t " +
-            "WHERE (:departureLocation IS NULL OR t.departure = :departureLocation) " +
-            "AND (:destination IS NULL OR t.destination = :destination) " +
-            "AND (:startDate IS NULL OR t.startDate = :startDate) " +
+            "WHERE (:departureLocation IS NULL OR LOWER(t.departure) LIKE LOWER(CONCAT('%', :departureLocation, '%'))) " +
+            "AND (:destination IS NULL OR LOWER(t.destination) LIKE LOWER(CONCAT('%', :destination, '%'))) " +
+            "AND (:date IS NULL OR (:date BETWEEN t.startDate AND t.endDate)) " +
             "AND (:maxPrice IS NULL OR t.price <= :maxPrice)")
     List<Tour> searchTours(
             @Param("departureLocation") String departureLocation,
             @Param("destination") String destination,
-            @Param("startDate") LocalDate startDate,
+            @Param("date") LocalDate date,
             @Param("maxPrice") Double maxPrice);
 
+
+
+
     Page<Tour> findAllByIsAboard(boolean isAboard, Pageable pageable);
+
+    @Query(value = "SELECT t FROM Tour t JOIN t.reviews r GROUP BY t.id ORDER BY AVG(r.rating) DESC LIMIT 7")
+    List<Tour> findTop7ByHighestRating();
+
 
 }

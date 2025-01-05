@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/tours")
-@CrossOrigin(origins = {"http://localhost:5173/","http://localhost:3000/"})
+@CrossOrigin(origins = {"http://localhost:5173/", "http://localhost:3000/"})
 
 public class TourController {
 
@@ -37,24 +37,13 @@ public class TourController {
     // API tạo tour mới
     @PostMapping("/create")
     public ResponseEntity<String> createTour(@RequestBody TourDTO tourDTO, @RequestHeader("Authorization") String authorizationHeader) {
-        if (permissions.checkToken(authorizationHeader)) {
-            String token = authorizationHeader.substring(7); // Bỏ tiền tố "Bearer ".
-            try {
-                // Kiểm tra quyền admin
-                if (!permissions.checkAdmin(token)) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
-                }
-
-                // Chuyển đổi DTO sang Entity và lưu vào database
-                Tour tour = convertToEntity(tourDTO);
-                tourRepository.save(tour);
-                return ResponseEntity.status(HttpStatus.OK).body("Add tour successful");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        try {
+            tourService.createTour(tourDTO, authorizationHeader);
+            return ResponseEntity.status(HttpStatus.OK).body("Add tour successful");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
+
     }
 
     private Tour convertToEntity(TourDTO tourDTO) {
@@ -171,6 +160,11 @@ public class TourController {
     @GetMapping("/abroad")
     public Page<TourDTO> getTourAbroad(Pageable pageable) {
         return tourService.findAllTourAbroad(pageable);
+    }
+
+    @GetMapping("/top-rated")
+    public List<TourDTO> getTopRatedTours() {
+        return tourService.getToursByTop();
     }
 }
 

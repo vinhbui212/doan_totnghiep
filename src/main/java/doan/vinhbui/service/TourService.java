@@ -21,4 +21,7 @@ public interface TourService {
     Page<TourDTO> findAllTour(Pageable pageable);
 
     Page<TourDTO> findAllTourAbroad(Pageable pageable);
+
+    List<TourDTO> getToursByTop();
+
 }

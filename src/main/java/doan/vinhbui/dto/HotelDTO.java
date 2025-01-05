@@ -18,5 +18,5 @@ public class HotelDTO {
     private String name;
     private String address;
     private Long customerId;
-    private String status;
+    private String status = "available";
 }

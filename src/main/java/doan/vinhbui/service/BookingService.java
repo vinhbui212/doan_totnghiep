@@ -17,4 +17,6 @@ public interface BookingService {
     Page<BookingDTO> getAllBookings(Pageable pageable);
     BookingDTO getBookingById(Long bookingId );
     void sendBookingConfirmation(String customerEmail, Booking booking);
+
+
 }

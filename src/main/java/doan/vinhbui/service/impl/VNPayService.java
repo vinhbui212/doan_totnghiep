@@ -145,13 +145,13 @@ public class VNPayService {
                     order.setBookingDate(LocalDate.from(LocalDateTime.now()));
                     order.setStatus("Paid");
                     bookingRepository.save(order);
-
+                    //3 500 000 00
                     Payment payment = new Payment();
                     payment.setBooking(order);
                     payment.setStatus("Paid");
                     payment.setPayment_type("ATM");
                     payment.setPayDate(LocalDateTime.now());
-                    payment.setAmount(Double.valueOf(amount));
+                    payment.setAmount(Double.valueOf(amount)/100);
                     paymentRepository.save(payment);
                     return 1;
                 }

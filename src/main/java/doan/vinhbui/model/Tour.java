@@ -51,7 +51,8 @@ public class Tour {
     private String schedule;
     @Column(name = "img_url")
     private String imgUrl;
-
+    private String imgUrl2;
+    private String imgUrl3;
 
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

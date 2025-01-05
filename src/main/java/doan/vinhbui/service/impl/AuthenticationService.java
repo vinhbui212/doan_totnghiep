@@ -38,29 +38,45 @@ public class AuthenticationService {
             Optional<Customer> customerCheck = customerRepository.findByEmail(request.getEmail());
             Optional<Admin> adminCheck = adminRepository.findByEmail(request.getEmail());
 
+            // Kiểm tra nếu email đã tồn tại trong bảng admin
             if (adminCheck.isPresent()) {
                 return AuthenticationResponse.builder().token("Already Exist").build();
             }
+
+            Customer customer;
             String jwtToken = null;
+
             if (customerCheck.isPresent()) {
-                Customer customer1 = customerCheck.get();
-                if (customer1.getIsVerified() || customer1.getIsGmail()) {
+                customer = customerCheck.get();
+                // Kiểm tra nếu khách hàng đã được xác thực hoặc đã dùng Gmail
+                if (customer.getIsVerified() || customer.getIsGmail()) {
                     return AuthenticationResponse.builder().token("Already Exist").build();
                 }
-                customer1.setFirstName(request.getFirstName());
-                customer1.setLastName(request.getLastName());
-                customer1.setPassword(passwordEncoder.encode(request.getPassword()));
-                customerRepository.save(customer1);
-//                setupVerification(customer1);
-            } else {
-                Customer customer = new Customer(request.getEmail(), passwordEncoder.encode(request.getPassword()), false
-                        , false, request.getFirstName(), request.getLastName());
+                // Cập nhật thông tin khách hàng chưa xác thực
+                customer.setFirstName(request.getFirstName());
+                customer.setLastName(request.getLastName());
+                customer.setPassword(passwordEncoder.encode(request.getPassword()));
                 customerRepository.save(customer);
-//                setupVerification(customer);
+                // setupVerification(customer); // Uncomment nếu cần thiết
+            } else {
+                // Tạo mới khách hàng
+                customer = new Customer(
+                        request.getEmail(),
+                        passwordEncoder.encode(request.getPassword()),
+                        false,
+                        false,
+                        request.getFirstName(),
+                        request.getLastName()
+                );
+                customerRepository.save(customer);
+                // setupVerification(customer); // Uncomment nếu cần thiết
                 jwtToken = jwtService.generateToken(customer);
             }
+
             return AuthenticationResponse.builder()
                     .token(jwtToken)
+                    .customerId(customer.getId())
+                    // Sử dụng đối tượng customer
                     .build();
 
         } catch (Exception e) {
@@ -68,6 +84,7 @@ public class AuthenticationService {
             return AuthenticationResponse.builder().token(e.getMessage()).build();
         }
     }
+
 
 
     public AuthenticationResponse authenticate(LoginRequest request) throws NoSuchElementException {

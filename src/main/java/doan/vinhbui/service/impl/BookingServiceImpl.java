@@ -35,7 +35,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public String addnewBooking(BookingDTO bookingDTO) throws Exception {
         // Kiểm tra xem khách hàng đã đặt tour này chưa
-        boolean bookingExists = bookingRepository.existsByCustomerIdAndTourId(
+        boolean bookingExists = bookingRepository.existsByCustomerIdAndTourIdAndStatusNotCanceled(
                 bookingDTO.getCustomerId(),
                 bookingDTO.getTourId()
         );
@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
 
     public BookingDTO convertToDto(Booking booking){
         BookingDTO bookingDTO= new BookingDTO();
-        bookingDTO.setCustomerName(booking.getCustomer().getName());
+        bookingDTO.setCustomerName(booking.getCustomer().getFirstName()+" "+booking.getCustomer().getLastName());
         bookingDTO.setCustomerId(booking.getCustomer().getId());
         bookingDTO.setBookingDate(booking.getBookingDate());
         bookingDTO.setTourName(booking.getTour().getTitle());
@@ -144,6 +144,8 @@ public class BookingServiceImpl implements BookingService {
         bookingDTO.setNumOfPeople(booking.getNumOfPeople());
         bookingDTO.setStatus(booking.getStatus());
         bookingDTO.setTravelDate(booking.getTour().getStartDate());
+
+        bookingDTO.setId(booking.getId());
         return bookingDTO;
     }
     @Override
