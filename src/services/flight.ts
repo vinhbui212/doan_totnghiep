@@ -9,7 +9,7 @@ export const getFlightDetailService = (params: {
 }) => {
 	return apiHttp.get<TFlightDetail>("/flights/getFlightDetails", {
 		params: {
-			currency_code: "VND",
+			currency_code: params.currency_code || "VND", // Dùng giá trị từ params hoặc mặc định là VND
 			token: params.token,
 		},
 	});
@@ -21,14 +21,25 @@ export interface IParamsSearchFlight {
 	departDate?: string;
 	returnDate?: string;
 	pageNo?: number;
+	currency_code?: string;
 }
 
-export const getLitFlightService = (params: IParamsSearchFlight) => {
-	params = filterParams(params);
-	return apiHttp.get<TResListFlight>("/flights/searchFlights", {
-		params,
+export const getLitFlightService = async (params: IParamsSearchFlight) => {
+	params = filterParams({
+		...params,
+		currency_code: params.currency_code || "VND", // Đảm bảo currency_code luôn tồn tại
 	});
+
+	try {
+		return await apiHttp.get<TResListFlight>("/flights/searchFlights", {
+			params,
+		});
+	} catch (error) {
+		console.error("Error fetching flight list:", error);
+		throw error; // Ném lỗi để hàm gọi bên trên xử lý
+	}
 };
+
 
 export const bookingSlightService = (body: any) => {
 	const customerId = localStorage.getItem("customerId");

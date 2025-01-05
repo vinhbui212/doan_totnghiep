@@ -14,6 +14,20 @@ export const orderTourService = async (data: any) => {
 	return await axiosCreatesForme.post("bookings", { ...data, customerId });
 };
 
+import axios from "axios";
+
+export const getAllBookingService = async () => {
+	try {
+		const response = await axios.get("http://localhost:8080/api/bookings/all");
+		console.log("Response data:", response.data); // Kiểm tra dữ liệu trả về
+		return response.data;
+	} catch (error) {
+		console.error("Error fetching bookings:", error);
+		throw error;
+	}
+};
+
+
 export const getAllTourService = async () => {
 	return (await axiosCreatesForme.get("tours")) as any;
 };

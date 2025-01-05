@@ -12,6 +12,7 @@ import FlightAdmin from "@/pages/admin/FlightAdmin";
 import HotelAdmin from "@/pages/admin/HotellAdmin";
 import CustomerAdmin from "@/pages/admin/CustomerAdmin";
 import PaymentAdmin from "@/pages/admin/PaymentAdmin";
+import BookingTourAdmin from "@/pages/admin/BookingTourAdmin";
 
 const routers: RouteObject[] = [
 	{
@@ -53,6 +54,7 @@ const routers: RouteObject[] = [
 		Component: LayoutAdmin,
 		children: [
 			{ path: paths.bookingAdmin, Component: BookingAdmin },
+			{ path: paths.tourAdmin, Component: BookingTourAdmin },
 			{ path: paths.flightAdmin, Component: FlightAdmin },
 			{ path: paths.hotelAdmin, Component: HotelAdmin },
 			{ path: paths.customerAdmin, Component: CustomerAdmin },

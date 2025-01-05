@@ -28,7 +28,7 @@ const ReviewTour = ({ idTour }: IProps) => {
 				comment: form.getFieldsValue().comment,
 				rating: rate,
 				date: dayjs().toISOString(),
-				customerName:name
+				customerName: name
 			});
 			handleGetData();
 			api.success({
@@ -36,6 +36,9 @@ const ReviewTour = ({ idTour }: IProps) => {
 			});
 			form.resetFields();
 		} catch (error) {
+			api.error({
+				message: "Vui lòng đăng nhập để đánh giá",
+			});
 			console.error(error);
 		}
 	};
@@ -49,16 +52,16 @@ const ReviewTour = ({ idTour }: IProps) => {
 			{contextHolder}
 			{dataReview?.map((d: any) => {
 				return (
-					<div className="flex border border-solid border-s-gray-500 rounded-md p-3 flex-col">
+					<div
+						className="flex border border-solid border-s-gray-500 rounded-md p-3 flex-col mb-5" // Thêm mb-5 để tạo khoảng cách giữa các đánh giá
+					>
 						<div className="flex gap-2">
 							<Typography.Text strong>{d?.customerName}</Typography.Text>
-							<Typography.Text>{`( ${dayjs(
-								d?.date
-							).fromNow()} )`}</Typography.Text>
+							<Typography.Text>{`( ${dayjs(d?.date).fromNow()} )`}</Typography.Text>
 						</div>
 						<Typography.Paragraph>{d?.comment}</Typography.Paragraph>
-						<Rate defaultValue={d?.rating ?? 0} disabled />
-					</div>
+						<Rate count={5} defaultValue={d?.rating ?? 0} disabled />
+						</div>
 				);
 			})}
 

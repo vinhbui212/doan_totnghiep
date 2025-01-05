@@ -68,7 +68,7 @@ const TicketAirline = () => {
 					<div className="mt-10">
 						<Typography.Title level={3}>Vé máy bay</Typography.Title>
 						<div className="flex items-center space-x-3 mb-5">
-							<em>Cập nhật ngày: 22/10/2024</em>
+							<em>Cập nhật ngày: 05/01/2025</em>
 							<strong>Đánh giá</strong>
 							<Rate allowHalf defaultValue={2.5} />
 						</div>

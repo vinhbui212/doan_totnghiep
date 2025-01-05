@@ -9,6 +9,7 @@ export const paths = {
 	detailHotel: "/hotel/:id",
 	information: "/information",
 
+	tourAdmin: "/tour-admin",
 	bookingAdmin: "/booking-admin",
 	flightAdmin: "/flight-admin",
 	hotelAdmin: "/hotel-admin",

@@ -159,6 +159,8 @@ const TourDetail = () => {
 	const { id } = useParams();
 	const [api, contextHolder] = notification.useNotification();
 	const [showOrderTour, setShowOrderTour] = useState(false);
+	const customerId = localStorage.getItem("customerId");
+
 	const { data, callApi } = useCallApi({
 		func: async () => {
 			if (!id) return;
@@ -167,10 +169,18 @@ const TourDetail = () => {
 	});
 
 	const handleFavorite = async () => {
+		if (!customerId) {
+			api.warning({
+				message: "Đăng nhập",
+				description: "Vui lòng đăng nhập.",
+			});
+			return;
+		}
 		try {
 			await favoriteTourService(id ?? '');
 			api.success({ message: 'Đã thêm vào danh sách yêu thích' })
 		} catch (error) {
+
 			console.log({ error })
 		}
 	}
@@ -213,7 +223,9 @@ const TourDetail = () => {
 						className="rounded-lg"
 						preview={false}
 						src={(data as ITourDetail)?.imgUrl}
+						style={{ maxWidth: '1000px', maxHeight: '700px' }}
 					/>
+
 					<div className="mt-6">
 						<Typography.Title level={3}>Điểm nhấn hành trình</Typography.Title>
 						<div className="flex flex-col gap-y-4 border-b-2 border-solid border-primary_color pb-4">
@@ -255,7 +267,7 @@ const TourDetail = () => {
 					<div className="pl-5 flex flex-col gap-y-5">
 						<div className="px-6 py-4 border border-solid border-gray-900 rounded-lg">
 							<span className="text-sm font-bold text-primary_color leading-6">
-								{(data as ITourDetail)?.schedule}
+								{(data as ITourDetail)?.description}
 							</span>
 							<ul className="mt-5">
 								<li className="flex gap-x-3 py-3 px-1 border-t border-solid border-gray-800">
@@ -318,8 +330,8 @@ const TourDetail = () => {
 			</Row>
 			{/* AI tour */}
 			<Typography.Title className="mt-3" level={3}>
-						Có thể bạn sẽ thích
-					</Typography.Title>
+				Có thể bạn sẽ thích
+			</Typography.Title>
 			<div className="mt-5">
 				<TourRecommendations />
 			</div>

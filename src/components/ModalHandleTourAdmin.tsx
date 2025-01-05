@@ -34,8 +34,19 @@ const ModalHandleTourAdmin = ({
 
 	const handleCreateTour = async () => {
 		const values = form.getFieldsValue();
+	
 		try {
-			await createTourService(values);
+			// Định dạng và loại bỏ khoảng trắng
+			const formattedStartDate = dayjs(values.startDate).format("YYYY-MM-DDTHH:mm:ss").trim();
+			const formattedEndDate = dayjs(values.endDate).format("YYYY-MM-DDTHH:mm:ss").trim();
+	
+			await createTourService({
+				...values,
+				id: valueModal?.tour?.id,
+				startDate: formattedStartDate,
+				endDate: formattedEndDate,
+			});
+	
 			api.success({ message: "Tạo tour thành công" });
 			callbackSuccess?.();
 			setValueModal({ open: false });
@@ -43,6 +54,7 @@ const ModalHandleTourAdmin = ({
 			console.error(error);
 		}
 	};
+	
 	const handleUpdateTour = async () => {
 		const values = form.getFieldsValue();
 		try {

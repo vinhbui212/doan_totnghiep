@@ -42,6 +42,15 @@ const DetailHotel = () => {
 	}, [data?.[0]?.data?.hotel_id]);
 
 	const onBookingHotel = async () => {
+		const customerId = localStorage.getItem("customerId");
+		if (!customerId) {
+			api.warning({
+				message: "Hãy đăng nhập",
+				description: "Bạn cần đăng nhập để thực hiện chức năng này.",
+			});
+			return; // Kết thúc hàm nếu không có customerId
+		}
+	
 		try {
 			await bookingHotelService({
 				pricePerNight:
@@ -50,13 +59,15 @@ const DetailHotel = () => {
 				name: detailHotel?.hotel_name,
 				address: `${detailHotel?.address}, ${detailHotel?.district}, ${detailHotel?.city_trans},
 					${detailHotel?.country_trans}`,
-				status: "string",
+				status: "available",
 			});
 			api.success({ message: "Đặt phòng thành công" });
 		} catch (error) {
 			console.error("Booking hotel error:", error);
+			api.error({ message: "Lỗi", description: "Có lỗi xảy ra khi đặt phòng." });
 		}
 	};
+	
 
 	useEffect(() => {
 		callApi();

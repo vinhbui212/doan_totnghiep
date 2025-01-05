@@ -30,21 +30,33 @@ const Header = ({ isAdmin }: IProps) => {
 	const handleSubmit = async () => {
 		try {
 			const values = form.getFieldsValue();
-			const res = isLoginSelected
-				? await loginAccountService(values)
-				: await registerAccountService(values);
+			let res;
+	
+			// Phân biệt giữa Đăng nhập và Đăng ký
+			if (isLoginSelected) {
+				res = await loginAccountService(values); // Xử lý đăng nhập
+				handleAuthSuccess(res); // Chỉ lưu token khi đăng nhập thành công
+				setIsLogin(true); // Đặt trạng thái đăng nhập thành true
+			} else {
+				res = await registerAccountService(values); // Xử lý đăng ký
+				// Không đặt trạng thái đăng nhập ở đây
+			}
+	
+			// Reset form và đóng modal
 			form.resetFields();
-			handleAuthSuccess(res);
 			setModal({ ...modal, open: false });
-			setIsLogin(true);
-			if (values?.email === "admin@gmail.com") {
+	
+			// Điều hướng nếu là admin
+			if (isLoginSelected && values?.email === "admin@gmail.com") {
 				navigate(paths.bookingAdmin);
 			}
+	
+			// Hiển thị thông báo thành công
 			api.open({
-				message: "Notification Title",
+				message: "Thông báo",
 				description: isLoginSelected
-					? "Login success"
-					: "Register account success",
+					? "Đăng nhập thành công"
+					: "Đăng kí thành công",
 				showProgress: true,
 				pauseOnHover: true,
 			});
@@ -52,6 +64,7 @@ const Header = ({ isAdmin }: IProps) => {
 			console.log({ error });
 		}
 	};
+	
 
 	const menus = useMemo(() => {
 		return {

@@ -9,8 +9,14 @@ const LayoutAdmin = () => {
 	const items: MenuItem[] = [
 		{
 			key: paths.bookingAdmin,
-			label: "Quản lý đặt tour",
+			label: "Quản lý tour",
 			onClick: () => navigate(paths.bookingAdmin),
+			// icon: <MailOutlined />,
+		},
+		{
+			key: paths.tourAdmin,
+			label: "Quản lý đặt tour",
+			onClick: () => navigate(paths.tourAdmin),
 			// icon: <MailOutlined />,
 		},
 		{

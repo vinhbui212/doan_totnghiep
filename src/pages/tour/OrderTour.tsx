@@ -25,10 +25,7 @@ interface IProps {
 const optionPayment = [
 	{ value: 0, label: "Thanh toán trực tiếp" },
 	{ value: 1, label: "Thanh toán qua ZaloPay" },
-	{ value: 2, label: "Thanh toán qua vis Momo" },
-	{ value: 3, label: "Thanh toán chuyển khoản cho ngân hàng" },
-	{ value: 4, label: "Thanh toán qua VNPAY" },
-	{ value: 5, label: "Thanh toán qua Viettel Money" },
+	
 ];
 const OrderTour = ({ tour }: IProps) => {
 	const [form] = Form.useForm();
@@ -69,40 +66,54 @@ const OrderTour = ({ tour }: IProps) => {
 	const customerId = localStorage.getItem("customerId");
 	const customerName = localStorage.getItem("customerName");
 	const onOrderTour = async () => {
+		if (!customerId) {
+			api.warning({
+				message: "Đăng nhập",
+				description: "Vui lòng đăng nhập để đặt tour.",
+			});
+			return;
+		}
+	
 		const values = form.getFieldsValue();
 		const paymentMethod = values.method;
+	
 		try {
 			const orderData = {
 				customerName: customerName, // Tên khách hàng
 				numOfPeople: (lv1).toString(), // Tổng số người tham gia
-				numOfChildren: (lv2).toString(), // Số lượng trẻ em, mặc định là 0
+				numOfChildren: (lv2).toString(), // Số lượng trẻ em
 				tourId: tour.id.toString(), // ID tour từ props
 				tourName: tour.title, // Tên tour từ props
 				travelDate: dayjs(values?.travelDate).format("YYYY-MM-DD"), // Ngày đi
-				customerId: customerId, // Mặc định ID khách hàng là 1
+				customerId: customerId, // ID khách hàng
 			};
+	
 			const res = await orderTourService(orderData);
-			// api.success({
-			// 	message: "Đặt tour thành công",
-			// });
-
-			console.log(res);
-			//  lây id booking từ res (api trả về khi tạo booking)
+	
 			if (paymentMethod === 1) {
+				// Điều hướng đến cổng thanh toán
 				const resPayment = await paymentSubmitOrderService(res);
 				window.location.href = resPayment;
+			} else {
+				// Hiển thị thông báo thành công
+				api.success({
+					message: "Đặt Tour",
+					description: "Đặt tour thành công",
+				});
+	
+				// Chuyển hướng về trang chủ
+				window.location.href = "/";
 			}
-			api.open({
-				message: "Đặt Tour",
-				description: "Đặt tour thành công",
-				showProgress: true,
-				pauseOnHover: true,
-			});
-
 		} catch (error) {
 			console.error(error);
+			api.error({
+				message: "Lỗi",
+				description: "Đặt tour không thành công. Vui lòng thử lại.",
+			});
 		}
 	};
+	
+	
 	return (
 		<Container>
 			{contextHolder}
@@ -110,7 +121,11 @@ const OrderTour = ({ tour }: IProps) => {
 				<Typography.Title level={3}>{tour?.title}</Typography.Title>
 				<div className="grid grid-cols-5">
 					<div className="col-span-2">
-						<Image src={tour.imgUrl ?? "https://dulichviet.com.vn/images/bandidau/NOI-DIA/Quy-Nhon/du-lich-quy-nhon-eo-gio-du-lich-viet.jpg"} />
+					<Image
+						src={tour.imgUrl ?? "https://dulichviet.com.vn/images/bandidau/NOI-DIA/Quy-Nhon/du-lich-quy-nhon-eo-gio-du-lich-viet.jpg"}
+						style={{ maxWidth: "300px", maxHeight: "200px", objectFit: "cover" }}
+						/>
+
 					</div>
 					<div className="col-span-3 text-gray-700 flex flex-col gap-5 px-10">
 						<p>

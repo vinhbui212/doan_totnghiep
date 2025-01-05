@@ -10,6 +10,7 @@ interface IProps {
 	token?: string;
 	currencyCode?: string;
 	price?: number;
+	date?: string;
 }
 const TicketItem = (props: IProps) => {
 	const navigate = useNavigate();
@@ -23,7 +24,7 @@ const TicketItem = (props: IProps) => {
 				</div>
 				<Image src={props.logo} className="!w-8 !h-8" />
 			</div>
-			<p className="text-gray-500 text-sm mt-2">22/10/2001</p>
+			<p className="text-gray-500 text-sm mt-2">{props.date}</p>
 			<p className="text-primary_color text-2xl font-bold mt-4">
 				{formatPrice(props.price, props.currencyCode)}
 			</p>

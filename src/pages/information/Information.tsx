@@ -40,35 +40,35 @@ const Information = () => {
 
 	const getInfoService = async () => {
 		try {
-		  const token = localStorage.getItem("token"); // Hoặc lấy từ cookies tùy theo cách lưu trữ token
-		  const response = await axios.get("http://localhost:8080/api/customers/info", {
-			headers: {
-			  Authorization: `Bearer ${token}`,  // Đảm bảo token được truyền trong header
-			},
-		  });
-		  return response.data;  // Dữ liệu trả về là thông tin khách hàng
-		} catch (error) {
-		  console.error("Error fetching customer info", error);
-		  throw error;  // Thông báo lỗi nếu có
-		}
-	  };
-	
-
-	  useEffect(() => {
-		const fetchCustomerInfo = async () => {
-		  try {
-			const data = await getInfoService();  // Gọi API để lấy thông tin
-			form.setFieldsValue(data);  // Điền dữ liệu vào form
-		  } catch (error) {
-			notification.error({
-			  message: "Lỗi khi lấy thông tin khách hàng",
-			  description: "Không thể lấy thông tin khách hàng từ server.",
+			const token = localStorage.getItem("token"); // Hoặc lấy từ cookies tùy theo cách lưu trữ token
+			const response = await axios.get("http://localhost:8080/api/customers/info", {
+				headers: {
+					Authorization: `Bearer ${token}`,  // Đảm bảo token được truyền trong header
+				},
 			});
-		  }
+			return response.data;  // Dữ liệu trả về là thông tin khách hàng
+		} catch (error) {
+			console.error("Error fetching customer info", error);
+			throw error;  // Thông báo lỗi nếu có
+		}
+	};
+
+
+	useEffect(() => {
+		const fetchCustomerInfo = async () => {
+			try {
+				const data = await getInfoService();  // Gọi API để lấy thông tin
+				form.setFieldsValue(data);  // Điền dữ liệu vào form
+			} catch (error) {
+				notification.error({
+					message: "Lỗi khi lấy thông tin khách hàng",
+					description: "Không thể lấy thông tin khách hàng từ server.",
+				});
+			}
 		};
-	
+
 		fetchCustomerInfo();
-	  }, [form]);
+	}, [form]);
 
 	const initTab = [
 		{ label: "Hồ sơ cá nhân", icon: <UserOutlined />, key: 0 },
@@ -97,11 +97,99 @@ const Information = () => {
 			console.log(error);
 		}
 	};
+	const cancelTourOrderService = async (bookingId: number, userId: number) => {
+		const token = localStorage.getItem("token"); // Đảm bảo token đã được lưu trữ
+		const response = await axios.post(
+			"http://localhost:8080/api/bookings/cancel", // URL API
+			null, // Body không cần dữ liệu
+			{
+				params: {
+					bookingId,
+					userId,
+				},
+				headers: {
+					Authorization: `Bearer ${token}`, // Thêm token vào header
+				},
+			}
+		);
+		return response.data; // Trả về phản hồi từ API
+	};
+	
+	const onCancelTour = async (bookingId: number) => {
+		const userId = localStorage.getItem("customerId"); // Lấy userId từ localStorage
+	
+		if (!userId) {
+			api.warning({
+				message: "Chưa đăng nhập",
+				description: "Vui lòng đăng nhập để thực hiện thao tác này.",
+			});
+			return;
+		}
+	
+		try {
+			await cancelTourOrderService(bookingId, parseInt(userId));
+			api.success({
+				message: "Hủy tour thành công",
+				description: `Đơn hàng với ID ${bookingId} đã được hủy.`,
+			});
+			callApi(); // Làm mới danh sách đơn hàng
+		} catch (error) {
+			api.error({
+				message: "Hủy tour thất bại",
+				description: error.response?.data || "Đã xảy ra lỗi khi hủy tour. Vui lòng thử lại.",
+			});
+		}
+	};
+	
+	const onRemoveFavorite = async (tourID: number) => {
+		try {
+			// Gọi API để xóa tour khỏi danh sách yêu thích
+			await removeFavoriteService(tourID);
+	
+			// Hiển thị thông báo thành công
+			api.success({
+				message: "Xóa thành công",
+				description: "Tour đã được xóa khỏi danh sách yêu thích.",
+			});
+	
+			// Làm mới danh sách yêu thích
+			callApiGetFavorite();
+		} catch (error) {
+			// Hiển thị thông báo lỗi nếu xóa thất bại
+			api.error({
+				message: "Xóa thất bại",
+				description: error.response?.data || "Đã xảy ra lỗi khi xóa khỏi danh sách yêu thích.",
+			});
+		}
+	};
+	
+	
+
+	const removeFavoriteService = async (tourID: number) => {
+		const token = localStorage.getItem("token"); // Lấy token từ localStorage
+		if (!token) {
+			throw new Error("Người dùng chưa đăng nhập");
+		}
+	
+		const response = await axios.delete("http://localhost:8080/api/wishlist/delete", {
+			params: {
+				tourID, // Truyền tourID làm tham số
+			},
+			headers: {
+				Authorization: `Bearer ${token}`, // Gửi token trong header
+			},
+		});
+		return response.data; // Trả về phản hồi từ API
+	};
+	
+	
+	
+
 
 	useEffect(() => {
 		callApi();
 		callApiGetFavorite();
-		
+
 	}, []);
 
 	const Content = () => {
@@ -113,7 +201,7 @@ const Information = () => {
 						<Form form={form} layout="vertical">
 							<div className="grid grid-cols-2 gap-5">
 								<Form.Item label="Email" name="email" required>
-									<Input placeholder="Email"  />
+									<Input placeholder="Email" />
 								</Form.Item>
 								<Form.Item label="Họ" name="firstName">
 									<Input placeholder="Họ" />
@@ -144,6 +232,10 @@ const Information = () => {
 			case 1: {
 				const columns: TableColumnsType<ITourOrder> = [
 					{
+						title: "ID",
+						dataIndex: "id",
+					},
+					{
 						title: "Tour order",
 						dataIndex: "tourName",
 						width: "30%",
@@ -168,6 +260,20 @@ const Information = () => {
 					{
 						title: "Trẻ em",
 						dataIndex: "numOfChildren",
+					},
+					{
+						title: "Action",
+						dataIndex: "action",
+						render: (_, record: ITourOrder) => (
+							<Button
+								type="primary"
+								danger
+								onClick={() => onCancelTour(record.id)} // Gọi hàm hủy tour
+								disabled={record.status === "CANCELED"} // Vô hiệu hóa nút nếu trạng thái là CANCELED
+							>
+								Hủy tour
+							</Button>
+						),
 					},
 				];
 				return (
@@ -200,11 +306,20 @@ const Information = () => {
 										}
 									/>
 									<Typography.Paragraph>{f?.details}</Typography.Paragraph>
+									<Button
+										type="primary"
+										danger
+										onClick={() => onRemoveFavorite(f.tour_id)} // Gọi hàm xóa
+									>
+										Xóa
+									</Button>
 								</div>
 							))}
 						</div>
 					</>
 				);
+				
+				
 			case 3:
 				return <h1>Thoát</h1>;
 		}
@@ -222,9 +337,8 @@ const Information = () => {
 								setCurrentTab(tab.key);
 								tab?.onClick?.();
 							}}
-							className={`flex items-center gap-5 cursor-pointer ${
-								currentTab === tab.key ? "text-primary_color" : ""
-							}`}
+							className={`flex items-center gap-5 cursor-pointer ${currentTab === tab.key ? "text-primary_color" : ""
+								}`}
 						>
 							<span>{tab.icon}</span>
 							<span>{tab.label}</span>

@@ -28,9 +28,12 @@ export interface ITourDetail {
 	schedule: string;
 	startDate: string;
 	title: string;
+	imgUrl2: string;
+	imgUrl3: string;
 }
 
 export interface ITourOrder {
+	id: number;
 	customerId: number;
 	customerName: string;
 	bookingDate: string;
@@ -40,6 +43,7 @@ export interface ITourOrder {
 	tourId: number;
 	tourName: string;
 	travelDate: string;
+	
 }
 
 export interface IFavorite {

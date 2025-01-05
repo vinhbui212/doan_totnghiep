@@ -7,8 +7,8 @@ export const getHotelsService = () => {
 		params: {
 			dest_id: "-3714993",
 			search_type: "CITY",
-			arrival_date: "2024-12-30",
-			departure_date: "2024-12-31",
+			arrival_date: "2025-01-05",
+			departure_date: "2025-01-09",
 			currency_code: "VND",
 		},
 	});
@@ -18,8 +18,8 @@ export const getHotelDetailService = (params: { id: number }) => {
 	return apiHttp.get<THotelDetail>("/hotels/getHotelDetails", {
 		params: {
 			hotel_id: params.id,
-			arrival_date: "2024-12-30",
-			departure_date: "2024-12-31",
+			arrival_date: "2025-01-05",
+			departure_date: "2025-01-09",
 		},
 	});
 };
