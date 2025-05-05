@@ -64,7 +64,7 @@ public class VNPAYController {
 
             return "redirect:http://localhost:5173";
         } else {
-            return "Failed"; // Trả về trang thất bại
+            return "redirect:http://localhost:5173/failed"; // Trả về trang thất bại
         }
 
     }
